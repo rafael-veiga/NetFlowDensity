@@ -1,0 +1,8 @@
+FROM alpine:latest
+
+RUN apk update && \
+    apk add --no-cache build-base cmake gdb
+
+WORKDIR /workspace
+
+CMD ["sh"]
