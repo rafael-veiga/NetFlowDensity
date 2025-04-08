@@ -25,11 +25,13 @@ int Data::get_pos(int lin, int col)
 
 void Data::loadFile(char *file)
 {
+    std::cout << "a1\n";
     int nlin = 0;
     int res[2];
     std::string line;
     char aux[30];
     this->getSizeDataFile(res, file);
+    std::cout << "a2\n";
     size_ev = res[0];
     ncol = res[1];
     value = new float[size_ev * ncol];
@@ -68,6 +70,7 @@ void Data::loadFile(char *file)
         nlin++;
     }
     saida.close();
+    std::cout << "a3\n";
 }
 
 void Data::getSizeDataFile(int *res, char *file)

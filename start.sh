@@ -12,7 +12,7 @@ else
             mv "$file" "$newfile"
         fi
     done
-    NEXTFLOW_ARGS=""
+    NEXTFLOW_ARGS="--pre=TRUE"
 fi
 
 # Constroi a imagem Docker

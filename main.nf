@@ -4,9 +4,13 @@ params.pre = params.pre ?: false
 include { pre1 } from './process/pre1.nf'
 include { binfile } from './process/binfile.nf'
 workflow {
-    csv_files = Channel.fromPath('data/*.csv')
+    
     if (params.pre) {
+        csv_files = Channel.fromPath('data/*.csv')
         pre1(csv_files)
+        binfile(csv_files)
+    }else{
+        dat_dir = Channel.value(file('data'))
     }
-    binfile(csv_files)
+    
 }

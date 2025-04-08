@@ -175,6 +175,7 @@ cython_debug/
 
 # folders
 data/
+data_aux/
 work/
 .nextflow/
 .nextflow.lo*

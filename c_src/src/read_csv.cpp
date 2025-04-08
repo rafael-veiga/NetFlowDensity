@@ -15,8 +15,7 @@ int main(int argc, char **argv)
     Data *data = new Data();
     if (argv[1][0] == 'r')
     {
-        if (data->loadData(argv[2]))
-            return 1;
+        data->loadFile(argv[2]);
         if (data->save(argv[3]))
             return 1;
     }
