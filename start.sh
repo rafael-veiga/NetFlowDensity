@@ -16,7 +16,12 @@ else
 fi
 
 # Constroi a imagem Docker
-docker build -t pre1docher dockers/pre1docker
+docker build -t pre1docker dockers/pre1docker
+docker build -f dockers/basedocker/Dockerfile -t basedocker .
+docker run --rm \
+  -v "$(pwd)/c_src:/project/c_src" \
+  -v "$(pwd)/scripts:/project/scripts" \
+  pre1docker \
+  /bin/bash -c "cd /project/c_src && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make && cp bin/process_file ../../scripts/ && chmod +x ../../scripts/process_file"
 
-# Executa o Nextflow passando os argumentos definidos (se houver)
 nextflow run main.nf -resume $NEXTFLOW_ARGS

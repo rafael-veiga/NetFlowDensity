@@ -1,11 +1,31 @@
 #include "Data.h"
 #include <iostream>
 
-int main(int argc, char** argv){
-char* infile = argv[1];
-char* outfile = argv[2];
+int main(int argc, char **argv)
+{
 
-Data* data = new Data();
-data->getSample(".",10,100);
-data->save("sample3.dat");
+    char *option = argv[1];
+    int seed = 12345;
+
+    if (argc < 3)
+    {
+        std::cout << "argments:\nr file_in file_out\ns folder number_sample_by_file file_out\n";
+        return 1;
+    }
+    Data *data = new Data();
+    if (argv[1][0] == 'r')
+    {
+        if (data->loadData(argv[2]))
+            return 1;
+        if (data->save(argv[3]))
+            return 1;
+    }
+    if (argv[1][0] == 's')
+    {
+        int nsample = std::atoi(argv[3]);
+        if (data->getSample(argv[2], nsample, seed))
+            return 1;
+        if (data->save(argv[4]))
+            return 1;
+    }
 }
