@@ -2,9 +2,6 @@
 
 # Se o argumento -pre for fornecido, não renomeia os arquivos e define o parâmetro para o Nextflow
 if [ "$1" = "-pre" ]; then
-    echo "Argumento '-pre' detectado: pulando a renomeação dos arquivos."
-    NEXTFLOW_ARGS="--pre=FALSE"
-else
     echo "Nenhum argumento '-pre' detectado: renomeando arquivos na pasta data."
     for file in data/*; do
         newfile=$(echo "$file" | sed 's/ /_/g')
@@ -13,6 +10,8 @@ else
         fi
     done
     NEXTFLOW_ARGS="--pre=TRUE"
+else
+    NEXTFLOW_ARGS="--pre=FALSE"
 fi
 
 # Constroi a imagem Docker

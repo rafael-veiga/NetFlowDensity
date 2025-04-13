@@ -8,5 +8,5 @@ include_directories(include)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-add_executable(process_file src/read_csv.cpp src/Data.cpp)
+add_executable(process_file src/read_csv.cpp src/Data.cpp src/List.cpp)
 

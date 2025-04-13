@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 
     if (argc < 3)
     {
-        std::cout << "argments:\nr file_in file_out\ns folder number_sample_by_file file_out\n";
+        std::cout << "argments:\nr file_in file_out\ns number_sample_by_file file_out file1.dat file2.dat ...\n";
         return 1;
     }
     Data *data = new Data();
