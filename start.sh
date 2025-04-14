@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Se o argumento -pre for fornecido, não renomeia os arquivos e define o parâmetro para o Nextflow
-if [ "$1" = "-pre" ]; then
+if [ "$1" = "--pre" ]; then
     echo "Nenhum argumento '-pre' detectado: renomeando arquivos na pasta data."
     for file in data/*; do
         newfile=$(echo "$file" | sed 's/ /_/g')

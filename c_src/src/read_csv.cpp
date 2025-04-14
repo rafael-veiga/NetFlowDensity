@@ -1,5 +1,6 @@
 #include "Data.h"
 #include <iostream>
+#include <string>
 
 int main(int argc, char **argv)
 {
@@ -21,10 +22,19 @@ int main(int argc, char **argv)
     }
     if (argv[1][0] == 's')
     {
-        int nsample = std::atoi(argv[3]);
-        if (data->getSample(argv[2], nsample, seed))
+        std::string *files_in;
+        int nfiles = 0;
+        int nsample = std::atoi(argv[2]);
+        files_in = new std::string[argc-4];
+        nfiles=0;
+        for (int i = 4; i < argc; i++)
+        {
+            files_in[nfiles] = argv[i];
+            nfiles++;
+        }
+        data->getSample(files_in, nfiles, nsample,seed);
+        if (data->save(argv[3]))
             return 1;
-        if (data->save(argv[4]))
-            return 1;
+        delete[] files_in;
     }
 }

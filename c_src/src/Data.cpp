@@ -3,10 +3,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <filesystem>
 #include <iostream>
-
-namespace fs = std::filesystem;
 
 Data::Data() : size_ev(0), ncol(0), col(nullptr), value(nullptr) {}
 
@@ -23,13 +20,11 @@ int Data::get_pos(int lin, int col)
 
 void Data::loadFile(char *file)
 {
-    std::cout << "a1\n";
     int nlin = 0;
     int res[2];
     std::string line;
     char aux[30];
     this->getSizeDataFile(res, file);
-    std::cout << "a2\n";
     size_ev = res[0];
     ncol = res[1];
     value = new float[size_ev * ncol];
@@ -68,14 +63,17 @@ void Data::loadFile(char *file)
         nlin++;
     }
     saida.close();
-    std::cout << "a3\n";
 }
 
-void Data::getSizeDataFile(int *res, char *file)
+int Data::getSizeDataFile(int *res, char *file)
 {
     std::ifstream saida(file);
     std::string line;
     int count = 1;
+    if (!saida.is_open()) {
+        std::cerr << "Erro: arquivo não encontrado!" << std::endl;
+        return 1;
+    }
 
     getline(saida, line);
     for (char c : line)
@@ -91,6 +89,7 @@ void Data::getSizeDataFile(int *res, char *file)
     }
     res[0] = count;
     saida.close();
+    return 0;
 }
 
 int Data::save(char *file)
@@ -153,44 +152,19 @@ int Data::loadData(char *file)
     return 0;
 }
 
-int Data::getSample(char *folder, int n_ev, int seed)
+void Data::getSample(std::string *files, int nfiles, int n_ev, int seed)
 {
-    // Inicializa o gerador de números aleatórios com a semente fornecida.
     srand(seed);
-
-    int fileCount = 0;
-    // Conta quantos arquivos .dat existem na pasta.
-    for (const auto &entry : fs::directory_iterator(folder))
-    {
-        if (entry.is_regular_file() && entry.path().extension() == ".dat")
-            fileCount++;
-    }
-
-    if (fileCount == 0)
-    {
-        std::cerr << "Nenhum arquivo .dat encontrado na pasta." << std::endl;
-        return -1;
-    }
-
-    // Calcula o total de eventos a serem amostrados: n_ev para cada arquivo.
-    int total_events = n_ev * fileCount;
-    // Inicialmente, o objeto Data está vazio (size_ev == 0), ou seja, sem dados carregados.
+    int total_events = n_ev * nfiles;
     int sample_index = 0;
 
-    // Itera sobre os arquivos .dat e processa cada um.
-    for (const auto &entry : fs::directory_iterator(folder))
+    for (int i = 0; i < nfiles; i++)
     {
-        if (entry.is_regular_file() && entry.path().extension() == ".dat")
-        {
-            int ret = processFile(entry.path().string(), n_ev, sample_index, total_events);
-            if (ret != 0)
-                return ret; // Se ocorrer algum erro ou inconsistência.
-        }
+        if (processFile(files[i], n_ev, sample_index, total_events))
+            std::cerr << "problem with file " << files[i] << std::endl;
     }
-    return 0;
 }
 
-// Método privado: processa cada arquivo .dat individualmente.
 int Data::processFile(const std::string &filepath, int n_ev, int &sample_index, int total_events)
 {
     std::ifstream in(filepath, std::ios::binary);
@@ -200,20 +174,16 @@ int Data::processFile(const std::string &filepath, int n_ev, int &sample_index, 
         return -1;
     }
 
-    // Lê o cabeçalho: número de eventos do arquivo e número de colunas.
     int file_size_ev = 0, file_ncol = 0;
     in.read(reinterpret_cast<char *>(&file_size_ev), sizeof(file_size_ev));
     in.read(reinterpret_cast<char *>(&file_ncol), sizeof(file_ncol));
-
-    // Se o objeto Data estiver vazio, inicializa os atributos com base no primeiro arquivo.
+ 
     if (this->size_ev == 0)
     {
         this->ncol = file_ncol;
         this->size_ev = total_events;
-        // Aloca memória para armazenar todos os eventos amostrados.
         this->value = new float[total_events * file_ncol];
 
-        // Lê o vetor de strings 'col' que está armazenado após os dados dos eventos.
         std::streampos col_offset = 2 * sizeof(int) + file_size_ev * file_ncol * sizeof(float);
         in.seekg(col_offset, std::ios::beg);
         this->col = new std::string[file_ncol];
@@ -228,14 +198,12 @@ int Data::processFile(const std::string &filepath, int n_ev, int &sample_index, 
     }
     else
     {
-        // Verifica se o número de colunas é consistente entre os arquivos.
         if (file_ncol != this->ncol)
         {
             std::cerr << "Inconsistência: número de colunas diferente no arquivo " << filepath << std::endl;
             in.close();
             return 1;
         }
-        // Verifica se os nomes das colunas são iguais.
         std::streampos col_offset = 2 * sizeof(int) + file_size_ev * file_ncol * sizeof(float);
         in.seekg(col_offset, std::ios::beg);
         for (int i = 0; i < file_ncol; i++)
@@ -253,7 +221,6 @@ int Data::processFile(const std::string &filepath, int n_ev, int &sample_index, 
         }
     }
 
-    // Gera uma lista com n_ev índices aleatórios (entre 0 e file_size_ev - 1).
     List positions(n_ev);
     for (int i = 0; i < n_ev; i++)
     {
@@ -263,13 +230,11 @@ int Data::processFile(const std::string &filepath, int n_ev, int &sample_index, 
             r = rand() % file_size_ev;
         }
     }
-    //positions.print();
-    // Ordena os índices para que as leituras sejam sequenciais e otimizadas.
 
-    for (int i=0;i < n_ev; i++){
+    for (int i = 0; i < n_ev; i++)
+    {
         std::streampos event_offset = 2 * sizeof(int) + positions.get(i) * file_ncol * sizeof(float);
         in.seekg(event_offset, std::ios::beg);
-        // Lê os dados do evento (um bloco de file_ncol floats) e armazena no vetor.
         in.read(reinterpret_cast<char *>(&this->value[sample_index * file_ncol]), file_ncol * sizeof(float));
         sample_index++;
     }

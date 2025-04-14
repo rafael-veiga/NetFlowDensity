@@ -12,7 +12,7 @@ public:
     void loadFile(char* file);
     int save(char* file);
     int loadData(char* file);
-    int getSample(char* folder, int n_ev, int seed);
+    void getSample(std::string *files, int nfiles, int n_ev, int seed);
 
 private:
     int size_ev;
@@ -20,7 +20,7 @@ private:
     std::string *col;
     float *value;
 
-    void getSizeDataFile(int* res, char* file);
+    int getSizeDataFile(int* res, char* file);
     int get_pos(int lin, int col);
     int processFile(const std::string& filepath, int n_ev, int& sample_index, int total_events);
 };

@@ -9,7 +9,7 @@ List::List(int size)
 }
 List::~List()
 {
-    delete this->data;
+    delete[] this->data;
 }
 int List::add(int value)
 {
@@ -17,6 +17,7 @@ int List::add(int value)
     Node *ant = 0;
     Node *node = &this->data[pos++];
     node->value = value;
+    node->next = 0;
     if (start == 0)
     {
         this->start = node;
@@ -26,6 +27,7 @@ int List::add(int value)
     {
         if (value == aux->value)
         {
+            pos--;
             return 1;
         }
         if (value < aux->value)

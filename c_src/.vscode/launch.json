@@ -7,7 +7,7 @@
         "type": "cppdbg",
         "request": "launch",
         "program": "${workspaceFolder}/build/app",
-        "args": ["s", ".files", "100","sample.dat"],
+        "args": ["r", "file1.csv","sample.dat"],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
         "environment": [],
