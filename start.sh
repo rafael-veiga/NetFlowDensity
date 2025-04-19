@@ -14,13 +14,16 @@ else
     NEXTFLOW_ARGS="--pre=FALSE"
 fi
 
-# Constroi a imagem Docker
-docker build -t pre1docker dockers/pre1docker
-docker build -f dockers/basedocker/Dockerfile -t basedocker .
-docker run --rm \
-  -v "$(pwd)/c_src:/project/c_src" \
-  -v "$(pwd)/scripts:/project/scripts" \
-  pre1docker \
-  /bin/bash -c "cd /project/c_src && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make && cp bin/process_file ../../scripts/ && chmod +x ../../scripts/process_file"
+# build docker images
+docker build -f dockers/compile1docker/Dockerfile -t compile1docker .
+docker run -it --rm -v "$(pwd)/c_src/comp1":/app compile1docker /bin/bash -c "g++ -std=c++17 -o3 read_csv.cpp Data.cpp List.cpp -o process_file"
+mv "$(pwd)/c_src/comp1/process_file" "$(pwd)/scripts"
+chmod +x "$(pwd)/scripts/process_file"
 
+docker build -f dockers/compile2docker/Dockerfile -t compile2docker .
+docker run -it --rm -v "$(pwd)/c_src/comp2":/app compile2docker /bin/bash -c "c++ -O3 -Wall -Wextra -shared -std=c++17 -fPIC $(python3 -m pybind11 --includes) c_py.cpp -o pyfileconverter$(python3-config --extension-suffix)"
+mv "$(pwd)/c_src/comp2/pyfileconverter.*" "$(pwd)/scripts"
+chmod +x "$(pwd)/scripts/pyfileconverter.*"
+
+docker build -f dockers/pre1docker/Dockerfile -t pre1docker .
 nextflow run main.nf -resume $NEXTFLOW_ARGS

@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 process sample {
     
-    container 'basedocker'
+    container 'linuxcontainers/debian-slim:12.5'
     
     input:
     path file_in

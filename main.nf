@@ -7,15 +7,12 @@ include { binfile } from './process/binfile.nf'
 include { sample } from './process/sample.nf'
 
 workflow {
-    
     if (params.pre) {
         csv_files = Channel.fromPath('data/*.csv')
         pre1_files = pre1(csv_files)
         bin_files_ch = binfile(pre1_files)
         bin_files_list = bin_files_ch.collect()
-        bin_files_list.view()
-        sample(bin_files_list, params.nsample)
-        //bin_files_list.view()
+        sample_ch = sample(bin_files_list, params.nsample)
     }else{
         dat_dir = Channel.value(file('data'))
     }
