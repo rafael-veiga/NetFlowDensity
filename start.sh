@@ -13,6 +13,16 @@ if [ "$1" = "--pre" ]; then
 else
     NEXTFLOW_ARGS="--pre=FALSE"
 fi
+ARGS_T=( "$@" )
+FILTERED_ARGS=()
+for a in "${ARGS_T[@]}"; do
+  if [[ "$a" != "--pre" ]]; then
+    FILTERED_ARGS+=( "$a" )
+  fi
+done
+ARGS_T=( "${FILTERED_ARGS[@]}" )
+
+FINAL_ARGS=( "$NEXTFLOW_ARGS" "${ARGS_T[@]}" )
 
 # build docker images
 docker build -f dockers/compile1docker/Dockerfile -t compile1docker .
@@ -26,4 +36,4 @@ mv "$(pwd)"/c_src/comp2/pyfileconverter.* "$(pwd)/scripts"
 chmod +x "$(pwd)"/scripts/pyfileconverter.*
 
 docker build -f dockers/pre1docker/Dockerfile -t pre1docker .
-nextflow run main.nf -resume $NEXTFLOW_ARGS
+nextflow run main.nf -resume ${FINAL_ARGS[@]} 
