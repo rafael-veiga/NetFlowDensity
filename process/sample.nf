@@ -8,7 +8,7 @@ process sample {
     val n_value
     
     output:
-    'sample.dat'
+    path 'sample.dat'
     
     script:
     """

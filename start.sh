@@ -36,4 +36,7 @@ mv "$(pwd)"/c_src/comp2/pyfileconverter.* "$(pwd)/scripts"
 chmod +x "$(pwd)"/scripts/pyfileconverter.*
 
 docker build -f dockers/pre1docker/Dockerfile -t pre1docker .
+docker build -f dockers/pydocker/Dockerfile -t pydocker .
+
 nextflow run main.nf -resume ${FINAL_ARGS[@]} 
+
