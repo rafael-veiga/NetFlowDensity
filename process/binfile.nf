@@ -2,9 +2,7 @@
 process binfile {
     
     container 'linuxcontainers/debian-slim:12.5'
-    
-    publishDir "${workflow.projectDir}/data_aux", mode: 'copy'
-    
+
     input:
     path file_in
     

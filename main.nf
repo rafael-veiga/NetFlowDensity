@@ -6,6 +6,7 @@ include { pre1 } from './process/pre1.nf'
 include { binfile } from './process/binfile.nf'
 include { sample } from './process/sample.nf'
 include { create_space } from './process/create_space.nf'
+include { do_space } from './process/do_space.nf'
 
 workflow {
     if (params.pre) {
@@ -15,6 +16,8 @@ workflow {
         bin_files_list = bin_files_ch.collect()
         sample_ch = sample(bin_files_list, params.nsample)
         space_ch = create_space(sample_ch)
+        file__aux_ch = do_space(bin_files_ch, space_ch)
+        
     }else{
         dat_dir = Channel.value(file('data'))
     }
