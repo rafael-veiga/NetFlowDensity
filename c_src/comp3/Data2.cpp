@@ -1,6 +1,8 @@
 #include "Data2.h"
 #include "fstream"
 #include <iostream>
+#include<string>
+#include <cstring>
 
 Data2::Data2()
 {
@@ -36,7 +38,7 @@ void Data2::convert(int n, char *file_in, char *file_out, float x1, float x2, fl
     std::ifstream saida(file_in, std::ios::binary);
     if (!saida)
     {
-        std::cout << "file not accessed\n";
+        std::cerr << "file not accessed\n";
         return;
     }
     this->n = n;
@@ -120,12 +122,44 @@ void Data2::convert(int n, char *file_in, char *file_out, float x1, float x2, fl
             }
         }
     }
+    
+    char s_aux[1000];
+    int count=0;
+    char c;
+    saida.seekg(10, std::ios::cur);
+    for(int i=0;i<this->ncol;i++){
+        saida.read(&c,1);        
+        while(c){
+            s_aux[count++]=c;
+            saida.read(&c,1);
+        }
+        s_aux[count++]=c;
+    }
+    this->col_names = new char[count];
+    std::memcpy(this->col_names,s_aux,count);
+    /*  file_out
+    int  n
+    int ncol
+    float[n * n * (ncol+1)]            // matrix
+    char[]  col_name_0 '\0' … col_name_N '\0'
+*/
+    saida.close();
 
-    //! add colunas name
+    std::ofstream out(file_out, std::ios::binary);
+    if (!out)
+    {
+        std::cerr << "file not accessed\n";
+        return;
+    }
+    out.write(reinterpret_cast<char*>(&this->n), sizeof(int));
+    out.write(reinterpret_cast<char*>(&this->ncol), sizeof(int));
+    out.write(reinterpret_cast<char*>(this->data), sizeof(float)*this->n*this->n*(this->ncol + 1));
+    out.write(this->col_names, count);
+    out.close();
     delete[] x;
     delete[] y;
     delete[] d_aux;
-    saida.close();
+    
 }
 
 void Data2::get_pos(int *index, float* value, float *x, float *y)

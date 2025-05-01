@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# c exec
+density
+process_file
+
 # Distribution / packaging
 .Python
 build/

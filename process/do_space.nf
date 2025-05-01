@@ -1,7 +1,6 @@
 #!/usr/bin/env nextflow
 process do_space {
     container 'pydocker'
-    publishDir "data_aux", mode: 'copy'
 
     input:
     path file_in
